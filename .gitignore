@@ -3,3 +3,4 @@ verilog/.vscode/
 verilog/model/
 verilog/sdk/
 *.dll
+*.o

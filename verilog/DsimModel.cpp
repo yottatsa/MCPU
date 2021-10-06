@@ -31,21 +31,21 @@ VOID DsimModel::setup(IINSTANCE *instance, IDSIMCKT *dsimckt) {
 
 	myPopup = (IDEBUGPOPUP *)instance->createpopup(cps);
 
-	InfoLog("Connecting control pins...");
+	//InfoLog("Connecting control pins...");
 
 	pin_OE = inst->getdsimpin("$OE$", true);				// Connects memory read pin
 	pin_WE = inst->getdsimpin("$WE$", true);				// Connects memory write pin
 	pin_RESET = inst->getdsimpin("$RESET$", true);			// Connects reset pin
 	pin_CLOCK = inst->getdsimpin("CLOCK", true);			// Connects Clock pin
 
-	InfoLog("Connecting data pins...");
+	//InfoLog("Connecting data pins...");
 	for (n = 0; n < 8; n++) {								// Connects Data pins
 		s[0] = 'D';
 		_itoa_s(n, &s[1], 7, 10);
 		pin_D[n] = inst->getdsimpin(s, true);
 	}
 
-	InfoLog("Connecting address pins...");
+	//InfoLog("Connecting address pins...");
 	for (n = 0; n < 16; n++) {								// Connects Address pins
 		s[0] = 'A';
 		_itoa_s(n, &s[1], 7, 10);
@@ -78,7 +78,6 @@ VOID DsimModel::clockstep(ABSTIME time, DSIMMODES mode) {
 		SyncOut(cpu->we, pin_WE);
 
 		cpu->eval();
-
 	}
 }
 
@@ -86,4 +85,9 @@ VOID DsimModel::simulate(ABSTIME time, DSIMMODES mode) {
 }
 
 VOID DsimModel::callback(ABSTIME time, EVENTID eventid) {
+}
+
+ISIBLING* DsimModel::queryinterface(UINT iid)
+{
+	return nullptr;
 }

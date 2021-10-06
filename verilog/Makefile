@@ -1,5 +1,6 @@
 VERILATOR_ROOT = $(shell verilator --getenv VERILATOR_ROOT)
 VERILATOR_INCLUDE = $(VERILATOR_ROOT)/include
+CXX = x86_64-w64-mingw32-g++
 CXXFLAGS = -I$(VERILATOR_INCLUDE)
 
 all: mcpu.dll
@@ -11,8 +12,8 @@ model/verilated.o model/VMCPU_0__ALLcls.o  model/VMCPU_0__ALLsup.o: MCPU_0.1a.v
 #%.o: %.cpp
 #	cd model; make -f VMCPU_0.mk ../$@
 
-mcpu.dll: model/verilated.o model/VMCPU_0__ALLcls.o  model/VMCPU_0__ALLsup.o ActiveModel.o dllmain.o DsimModel.o mcpu.o StdAfx.o
-	g++ -shared -o mcpu.dll $^
+mcpu.dll: model/verilated.o model/VMCPU_0__ALLcls.o  model/VMCPU_0__ALLsup.o ActiveModel.o dllmain.o DsimModel.o mcpu.o
+	$(CXX) -shared -o mcpu.dll $^
 
 clean:
 	rm -rf model mcpu.dll *.o
