@@ -1,3 +1,5 @@
+verilog/.vs/
 verilog/.vscode/
-verilog/mcpu/
+verilog/model/
 verilog/sdk/
+*.dll
