@@ -7,6 +7,7 @@
 //
 // t.boescke@tuhh.d
 
+/* verilator lint_off CASEINCOMPLETE */
 
 module mcpu(data,adress,oe,we,rst,clk);
 
@@ -23,8 +24,8 @@ reg [5:0] pc;
 reg [2:0] states;
 
 initial begin
-	$display("time, state, adreg, pc, rst, clk, data, adress, oe");
-	$monitor($stime,",states=",states, ", adreg=", adreg, ",pc=", pc, ",rst=", rst,",clk=",clk,",data=",data,",address=",adress,",oe =",oe); 
+	//$display("time, state, adreg, pc, rst, clk, data, adress, oe");
+	//$monitor($stime,",states=",states, ", adreg=", adreg, ",pc=", pc, ",rst=", rst,",clk=",clk,",data=",data,",address=",adress,",oe =",oe); 
 end
 
 	always @(posedge clk)
