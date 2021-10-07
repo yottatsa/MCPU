@@ -8,7 +8,7 @@
 extern "C" {
 IDSIMMODEL __declspec(dllexport) *
     createdsimmodel(CHAR *device, ILICENCESERVER *ils) {
-  if (ils->authorize(VSMModel_key, VSMModel_API))
+  if (ils->authorize(PRODUCT_ID, API_VER))
     return new DsimModel;
   else
     return NULL;

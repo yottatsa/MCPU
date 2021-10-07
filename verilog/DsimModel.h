@@ -15,6 +15,13 @@
   myPopup->print(__s__);                                                       \
   myPopup->print("\n")
 
+#define SyncIn(vsm_pin, v_pin) v_pin = ishigh(vsm_pin->istate());
+#define SyncOut(v_pin, vsm_pin)                                                \
+  if (v_pin)                                                                   \
+    vsm_pin->SetHigh;                                                          \
+  else                                                                         \
+    vsm_pin->SetLow;
+
 #define SetHigh setstate(time, 1, SHI)
 #define SetLow setstate(time, 1, SLO)
 #define SetFloat setstate(time, 1, FLT)
