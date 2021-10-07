@@ -1,4 +1,4 @@
-//#include "stdafx.h"
+#include "StdAfx.h"
 #include "DsimModel.h"
 
 INT DsimModel::isdigital(CHAR *pinname) {
@@ -53,14 +53,20 @@ VOID DsimModel::setup(IINSTANCE *instance, IDSIMCKT *dsimckt) {
     pin_A[i] = inst->getdsimpin(s, true);
   }
 
+  // disconnect bus
   for (i = 0; i < DATABUS; i++) {
     pin_D[i]->SetFloat;
   }
-  SyncIn(pin_CLK, cpu->clk);
-  SyncIn(pin_RST, cpu->rst);
 
+  // reset processor
+  cpu->rst = 0;
+  cpu->eval();
+
+  // write out initial state
   SyncOut(cpu->oe, pin_OE);
   SyncOut(cpu->we, pin_WE);
+
+  InfoLog("CPU started...");
 
   // Connects function to handle Clock steps (instead of using "simulate")
   pin_CLK->sethandler(this, (PINHANDLERFN)&DsimModel::clockstep);
@@ -75,52 +81,75 @@ BOOL DsimModel::indicate(REALTIME time, ACTIVEDATA *data) { return FALSE; }
 VOID DsimModel::clockstep(ABSTIME time, DSIMMODES mode) {
   unsigned char i, a;
 
+#ifdef DEBUG
   if (!Verilated::gotFinish() &&
       (pin_CLK->isposedge() || pin_CLK->isnegedge())) {
     sprintf_s(LogMessage, (pin_CLK->isposedge()) ? "Pos" : "Neg");
     InfoLog(LogMessage);
   }
+#endif
 
   if (!Verilated::gotFinish() && pin_CLK->isnegedge()) {
-    SyncIn(pin_CLK, cpu->clk);
+    // changes happens on this edge
+    // sync rst
     SyncIn(pin_RST, cpu->rst);
-    pin_OE->SetHigh;
-    pin_WE->SetHigh;
+    cpu->eval();
 
+    // sync edge
+    SyncIn(pin_CLK, cpu->clk);
+    cpu->eval();
+
+    // disconnect bus
     for (i = 0; i < DATABUS; i++) {
       pin_D[i]->SetFloat;
     }
 
-    cpu->eval();
-
-    if (cpu->oe == 0) {
+    // CPU may do memory operation
+    // Set address
+    if (cpu->oe == 0 || cpu->we == 0) {
       a = cpu->adress;
-      sprintf_s(LogMessage, "Address: %02x", a);
-      InfoLog(LogMessage);
+#ifdef DEBUG
+      if (cpu->oe == 0) {
+        sprintf_s(LogMessage, "Prepare to read from: %02x", a);
+        InfoLog(LogMessage);
+      }
+#endif
 
       for (i = 0; i < ADDRESSBUS; i++) {
         SyncOut(a & 1, pin_A[i]);
         a = a >> 1;
       }
-
-      if (cpu->we == 0) {
-        a = cpu->data;
-
-        for (i = 0; i < DATABUS; i++) {
-          SyncOut(a & 1, pin_D[i]);
-          a = a >> 1;
-        }
-        sprintf_s(LogMessage, "Write %02x to %02x", cpu->data, cpu->adress);
-        InfoLog(LogMessage);
-      }
     }
 
+    // If write then set data
+    if (cpu->we == 0) {
+      a = cpu->data;
+
+      for (i = 0; i < DATABUS; i++) {
+        SyncOut(a & 1, pin_D[i]);
+        a = a >> 1;
+      }
+
+#ifdef DEBUG
+      sprintf_s(LogMessage, "Write %02x to %02x", cpu->data, cpu->adress);
+      InfoLog(LogMessage);
+#endif
+    }
+
+    // write out bus operation
     SyncOut(cpu->oe, pin_OE);
     SyncOut(cpu->we, pin_WE);
   }
 
   if (!Verilated::gotFinish() && pin_CLK->isposedge()) {
-    if (cpu->oe == 0 && !(cpu->we == 0)) {
+    // no operations on this edge
+    // sync rst anyway
+    SyncIn(pin_RST, cpu->rst);
+    cpu->eval();
+
+    // upload memory read result before committing edge
+    // only if we set the leg
+    if (islow(pin_OE->istate())) {
       a = 0;
       for (i = 0; i < DATABUS; i++) {
         if (ishigh(pin_D[i]->istate())) {
@@ -131,13 +160,21 @@ VOID DsimModel::clockstep(ABSTIME time, DSIMMODES mode) {
       }
       cpu->data = a;
 
+#ifdef DEBUG
       sprintf_s(LogMessage, "Read %02x from %02x", cpu->data, cpu->adress);
       InfoLog(LogMessage);
-    }
+#endif
+
+    }    
     cpu->eval();
+
+    // sync edge
     SyncIn(pin_CLK, cpu->clk);
-    SyncIn(pin_RST, cpu->rst);
     cpu->eval();
+
+    // clear out bus operation
+    SyncOut(cpu->oe, pin_OE);
+    SyncOut(cpu->we, pin_WE);
   }
 }
 

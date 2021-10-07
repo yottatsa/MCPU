@@ -6,6 +6,7 @@
 #include "model/VMCPU_0.h"
 #include "verilated.h"
 
+//#define DEBUG
 #define DATABUS 8
 #define ADDRESSBUS 6
 
