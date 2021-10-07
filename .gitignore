@@ -2,5 +2,7 @@ verilog/.vs/
 verilog/.vscode/
 verilog/model/
 verilog/sdk/
+verilog/Project Backups/
+*.workspace
 *.dll
 *.o

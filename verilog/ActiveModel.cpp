@@ -1,30 +1,15 @@
-#include "StdAfx.h"
 #include "ActiveModel.h"
 #include "DsimModel.h"
+#include "StdAfx.h"
 
-VOID ActiveModel::initialize (ICOMPONENT* cpt)
-{
-}
+VOID ActiveModel::initialize(ICOMPONENT *cpt) {}
 
-ISPICEMODEL *ActiveModel::getspicemodel (CHAR *primitive)
-{
-	return NULL;
-}
+ISPICEMODEL *ActiveModel::getspicemodel(CHAR *primitive) { return NULL; }
 
-IDSIMMODEL *ActiveModel::getdsimmodel (CHAR *primitive)
-{
-	return new DsimModel;
-}
+IDSIMMODEL *ActiveModel::getdsimmodel(CHAR *primitive) { return new DsimModel; }
 
-VOID ActiveModel::plot (ACTIVESTATE state)
-{
-}
+VOID ActiveModel::plot(ACTIVESTATE state) {}
 
-VOID ActiveModel::animate (INT element, ACTIVEDATA *newstate)
-{
-}
+VOID ActiveModel::animate(INT element, ACTIVEDATA *newstate) {}
 
-BOOL ActiveModel::actuate (WORD key, INT x, INT y, DWORD flags)
-{
-	return FALSE;
-}
+BOOL ActiveModel::actuate(WORD key, INT x, INT y, DWORD flags) { return FALSE; }
