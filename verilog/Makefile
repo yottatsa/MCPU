@@ -13,7 +13,7 @@ model/verilated.o model/VMCPU_0__ALL.o: MCPU_0.1a.v
 #	cd model; make -f VMCPU_0.mk ../$@
 
 mcpu.dll: model/verilated.o model/VMCPU_0__ALL.o ActiveModel.o dllmain.o DsimModel.o mcpu.o
-	$(CXX) -shared -o mcpu.dll $^
+	$(CXX) -static -static-libgcc -shared -o mcpu.dll $^
 
 clean:
 	rm -rf model mcpu.dll *.o
